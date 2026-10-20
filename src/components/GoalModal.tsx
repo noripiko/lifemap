@@ -154,7 +154,7 @@ export const GoalModal: React.FC<GoalModalProps> = ({
                 min="1"
                 max="120"
                 required
-                placeholder="40"
+                placeholder="例: 30, 60, 100"
                 value={targetAge}
                 onChange={(e) => setTargetAge(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-base sm:text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-900 transition-colors tabular-nums shadow-2xs pr-12 font-medium"

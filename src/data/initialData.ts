@@ -5,7 +5,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   birthYear: 1998,
   birthMonth: 5,
   currentAge: 28,
-  targetLifespan: 85,
+  targetLifespan: 100,
   motto: 'やりたいことは先延ばしにせず、年齢ごとに最高の思い出をつくる',
   isCustomAge: false,
 };

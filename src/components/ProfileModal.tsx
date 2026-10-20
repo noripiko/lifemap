@@ -123,6 +123,23 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </span>
           </div>
 
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              ロードマップの終点（目標寿命）
+            </label>
+            <select
+              value={targetLifespan}
+              onChange={(e) => setTargetLifespan(Number(e.target.value))}
+              className="w-full px-3.5 py-2.5 text-base sm:text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono shadow-2xs"
+            >
+              {[90, 95, 100, 105, 110, 120].map((age) => (
+                <option key={age} value={age}>
+                  {age}歳 {age === 100 ? '（人生100年時代）' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* PWA App Icon and Home Screen installation */}
           <div className="pt-3 border-t border-slate-200 text-xs">
             <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200/80">
