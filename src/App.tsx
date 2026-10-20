@@ -7,9 +7,8 @@ import {
   saveGoals,
 } from './utils/lifemapUtils';
 import { INITIAL_GOALS } from './data/initialData';
-import { Navbar, ActiveTab } from './components/Navbar';
+import { Navbar } from './components/Navbar';
 import { TimelineView } from './components/TimelineView';
-import { TravelView } from './components/TravelView';
 import { GoalModal } from './components/GoalModal';
 import { ProfileModal } from './components/ProfileModal';
 import { PWAInstallButton } from './components/PWAInstallButton';
@@ -17,7 +16,6 @@ import { PWAInstallButton } from './components/PWAInstallButton';
 export default function App() {
   const [profile, setProfile] = useState<UserProfile>(loadProfile);
   const [goals, setGoals] = useState<GoalItem[]>(loadGoals);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('timeline');
 
   // Modals
   const [goalModalOpen, setGoalModalOpen] = useState(false);
@@ -93,13 +91,6 @@ export default function App() {
     setGoalModalOpen(true);
   };
 
-  const handleOpenNewTravelGoal = () => {
-    setGoalToEdit(null);
-    setInitialAgeForModal(profile.currentAge);
-    setInitialCategoryForModal('travel');
-    setGoalModalOpen(true);
-  };
-
   const handleEditGoal = (goal: GoalItem) => {
     setGoalToEdit(goal);
     setInitialAgeForModal(undefined);
@@ -137,10 +128,8 @@ export default function App() {
         className="hidden"
       />
 
-      {/* Clean, Uncluttered Top Navbar */}
+      {/* Clean, Uncluttered Top Navbar with Single Global Add Button */}
       <Navbar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
         profile={profile}
         onOpenSettings={() => setProfileModalOpen(true)}
         onOpenNewGoal={() => {
@@ -156,27 +145,14 @@ export default function App() {
           <PWAInstallButton />
         </div>
 
-        {activeTab === 'timeline' && (
-          <TimelineView
-            goals={goals}
-            profile={profile}
-            onEditGoal={handleEditGoal}
-            onDeleteGoal={handleDeleteGoal}
-            onToggleStatus={handleToggleStatus}
-            onAddGoalForAge={handleOpenNewGoalForAge}
-          />
-        )}
-
-        {activeTab === 'travel' && (
-          <TravelView
-            goals={goals}
-            profile={profile}
-            onEditGoal={handleEditGoal}
-            onDeleteGoal={handleDeleteGoal}
-            onToggleStatus={handleToggleStatus}
-            onAddTravelGoal={handleOpenNewTravelGoal}
-          />
-        )}
+        <TimelineView
+          goals={goals}
+          profile={profile}
+          onEditGoal={handleEditGoal}
+          onDeleteGoal={handleDeleteGoal}
+          onToggleStatus={handleToggleStatus}
+          onAddGoalForAge={handleOpenNewGoalForAge}
+        />
       </main>
 
       {/* Modals */}

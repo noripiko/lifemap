@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GoalItem, UserProfile } from '../types/lifemap';
 import { GoalCard } from './GoalCard';
 import { groupGoalsByDecade } from '../utils/lifemapUtils';
-import { Plus, List, Circle, CheckCircle2 } from 'lucide-react';
+import { List, Circle, CheckCircle2, Plane, Plus } from 'lucide-react';
 
 interface TimelineViewProps {
   goals: GoalItem[];
@@ -21,14 +21,16 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onToggleStatus,
   onAddGoalForAge,
 }) => {
-  const [filter, setFilter] = useState<'all' | 'pending' | 'achieved'>('all');
+  const [filter, setFilter] = useState<'all' | 'pending' | 'achieved' | 'travel'>('all');
 
   const pendingCount = goals.filter((g) => g.status !== 'achieved').length;
   const achievedCount = goals.filter((g) => g.status === 'achieved').length;
+  const travelCount = goals.filter((g) => g.category === 'travel' || g.isTravel || Boolean(g.location)).length;
 
   const filteredGoals = goals.filter((g) => {
     if (filter === 'pending') return g.status !== 'achieved';
     if (filter === 'achieved') return g.status === 'achieved';
+    if (filter === 'travel') return g.category === 'travel' || g.isTravel || Boolean(g.location);
     return true;
   });
 
@@ -36,18 +38,19 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      {/* Status Filter Bar */}
-      <div className="flex items-center justify-between pb-1 text-xs sm:text-sm">
-        <div className="flex items-center bg-slate-100 p-0.5 rounded-lg">
+      {/* Icon-Only Filter Bar */}
+      <div className="flex items-center pb-1 text-xs sm:text-sm">
+        <div className="flex items-center bg-slate-100 p-0.5 rounded-xl gap-0.5">
           {/* All */}
           <button
             onClick={() => setFilter('all')}
-            className={`p-1.5 px-3 rounded-md flex items-center gap-1.5 transition-colors cursor-pointer ${
+            className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer ${
               filter === 'all'
                 ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                 : 'text-slate-500 hover:text-slate-800'
             }`}
             title="すべて表示"
+            aria-label="すべて"
           >
             <List className="w-4 h-4" />
             <span className="tabular-nums text-xs font-semibold">{goals.length}</span>
@@ -56,40 +59,48 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           {/* Pending */}
           <button
             onClick={() => setFilter('pending')}
-            className={`p-1.5 px-3 rounded-md flex items-center gap-1.5 transition-colors cursor-pointer ${
+            className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer ${
               filter === 'pending'
                 ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                 : 'text-slate-500 hover:text-slate-800'
             }`}
             title="未完了のみ表示"
+            aria-label="未完了"
           >
-            <Circle className="w-4 h-4 text-slate-400" />
+            <Circle className="w-3.5 h-3.5 text-slate-400" />
             <span className="tabular-nums text-xs font-semibold">{pendingCount}</span>
           </button>
 
           {/* Achieved */}
           <button
             onClick={() => setFilter('achieved')}
-            className={`p-1.5 px-3 rounded-md flex items-center gap-1.5 transition-colors cursor-pointer ${
+            className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer ${
               filter === 'achieved'
                 ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                 : 'text-slate-500 hover:text-slate-800'
             }`}
             title="達成済みのみ表示"
+            aria-label="達成済み"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span className="tabular-nums text-xs font-semibold">{achievedCount}</span>
           </button>
-        </div>
 
-        {/* Quick add goal for current age */}
-        <button
-          onClick={() => onAddGoalForAge(profile.currentAge)}
-          className="text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer py-1.5 px-2.5 rounded-lg hover:bg-slate-100"
-        >
-          <Plus className="w-4 h-4" />
-          <span>追加</span>
-        </button>
+          {/* Travel */}
+          <button
+            onClick={() => setFilter('travel')}
+            className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer ${
+              filter === 'travel'
+                ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+            title="旅行・行きたい場所のみ表示"
+            aria-label="旅行"
+          >
+            <Plane className="w-4 h-4 text-sky-600" />
+            <span className="tabular-nums text-xs font-semibold">{travelCount}</span>
+          </button>
+        </div>
       </div>
 
       {/* Timeline Stream */}
