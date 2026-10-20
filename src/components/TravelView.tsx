@@ -8,6 +8,8 @@ import {
   Check,
   Globe,
   Plane,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 
 interface TravelViewProps {
@@ -22,10 +24,12 @@ interface TravelViewProps {
 export const TravelView: React.FC<TravelViewProps> = ({
   goals,
   onEditGoal,
+  onDeleteGoal,
   onToggleStatus,
   onAddTravelGoal,
 }) => {
   const [filterRegion, setFilterRegion] = useState<'all' | 'japan' | 'overseas'>('all');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const travelGoals = goals.filter((g) => g.category === 'travel' || g.isTravel || Boolean(g.location));
 
@@ -40,6 +44,10 @@ export const TravelView: React.FC<TravelViewProps> = ({
     if (filterRegion === 'overseas') return !isDomestic(g.location);
     return true;
   }).sort((a, b) => a.targetAge - b.targetAge);
+
+  const toggleExpand = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
 
   return (
     <div className="max-w-xl mx-auto space-y-4">
@@ -98,77 +106,138 @@ export const TravelView: React.FC<TravelViewProps> = ({
         <div className="space-y-1.5">
           {filteredGoals.map((goal) => {
             const isAchieved = goal.status === 'achieved';
+            const isExpanded = expandedId === goal.id;
 
             return (
               <div
                 key={goal.id}
-                className={`bg-white rounded-xl border p-3 flex items-start gap-3 transition-all ${
+                className={`bg-white rounded-xl border p-3 transition-all ${
                   isAchieved
                     ? 'border-slate-200 bg-slate-50/50 opacity-75'
                     : 'border-slate-200 hover:border-slate-300'
                 }`}
               >
-                {/* Checkbox */}
-                <button
-                  onClick={() => onToggleStatus(goal)}
-                  className="mt-0.5 shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition-colors cursor-pointer focus:outline-none"
-                  style={{
-                    borderColor: isAchieved ? '#10b981' : '#cbd5e1',
-                    backgroundColor: isAchieved ? '#10b981' : 'transparent',
-                  }}
-                  title={isAchieved ? '訪問済み' : 'クリックして訪問済みにする'}
-                >
-                  {isAchieved && (
-                    <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
-                  )}
-                </button>
+                <div className="flex items-start gap-3">
+                  {/* Checkbox */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleStatus(goal);
+                    }}
+                    className="mt-0.5 shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition-colors cursor-pointer focus:outline-none"
+                    style={{
+                      borderColor: isAchieved ? '#10b981' : '#cbd5e1',
+                      backgroundColor: isAchieved ? '#10b981' : 'transparent',
+                    }}
+                    title={isAchieved ? '訪問済み' : 'クリックして訪問済みにする'}
+                  >
+                    {isAchieved && (
+                      <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
+                    )}
+                  </button>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0" onClick={() => onEditGoal(goal)}>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xs font-bold text-slate-800 tabular-nums shrink-0">
-                      {goal.targetAge}歳
-                    </span>
-                    <h4
-                      className={`text-sm font-medium leading-snug break-words ${
-                        isAchieved ? 'line-through text-slate-400' : 'text-slate-900'
-                      }`}
-                    >
-                      {goal.title}
-                    </h4>
-                  </div>
-
-                  {/* Location & Google Map link */}
-                  <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 flex-wrap">
-                    {goal.location && (
-                      <span className="flex items-center gap-1 text-slate-600">
-                        <MapPin className="w-3 h-3 text-sky-600 shrink-0" />
-                        <span>{goal.location}</span>
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                            goal.location
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-slate-400 hover:text-sky-600 p-0.5"
-                          title="Google Maps"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
+                  {/* Content - Click expands details, does not jump to edit screen */}
+                  <div
+                    className="flex-1 min-w-0 cursor-pointer select-none"
+                    onClick={() => toggleExpand(goal.id)}
+                  >
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xs font-bold text-slate-800 tabular-nums shrink-0">
+                        {goal.targetAge}歳
                       </span>
-                    )}
+                      <h4
+                        className={`text-sm font-medium leading-snug break-words ${
+                          isAchieved ? 'line-through text-slate-400' : 'text-slate-900'
+                        }`}
+                      >
+                        {goal.title}
+                      </h4>
+                    </div>
 
-                    {goal.budget && (
-                      <>
-                        <span aria-hidden="true" className="text-slate-300">·</span>
-                        <span className="tabular-nums">
-                          予算 {formatYen(goal.budget)}
+                    {/* Location & Google Map link preview */}
+                    <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 flex-wrap">
+                      {goal.location && (
+                        <span className="flex items-center gap-1 text-slate-600">
+                          <MapPin className="w-3 h-3 text-sky-600 shrink-0" />
+                          <span>{goal.location}</span>
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                              goal.location
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-slate-400 hover:text-sky-600 p-0.5"
+                            title="Google Maps"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
                         </span>
-                      </>
-                    )}
+                      )}
+
+                      {goal.budget && (
+                        <>
+                          <span aria-hidden="true" className="text-slate-300">·</span>
+                          <span className="tabular-nums">
+                            予算 {formatYen(goal.budget)}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Dedicated Edit Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditGoal(goal);
+                    }}
+                    className="shrink-0 p-1.5 text-slate-400 hover:text-slate-800 active:text-slate-950 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                    title="旅行目標を編集"
+                    aria-label="編集"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
                 </div>
+
+                {/* Expanded Details */}
+                {isExpanded && (
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 text-xs space-y-2">
+                    {goal.notes && (
+                      <p className="text-slate-600 bg-slate-50 p-2.5 rounded-lg whitespace-pre-wrap leading-relaxed">
+                        {goal.notes}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm('この場所を削除しますか？')) {
+                            onDeleteGoal(goal.id);
+                          }
+                        }}
+                        className="text-[11px] text-rose-500 hover:text-rose-700 py-1 px-2 rounded hover:bg-rose-50 flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>削除</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditGoal(goal);
+                        }}
+                        className="text-[11px] font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 py-1 px-2.5 rounded-md flex items-center gap-1 cursor-pointer"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        <span>編集する</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
