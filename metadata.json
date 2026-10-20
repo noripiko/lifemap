@@ -1,0 +1,6 @@
+{
+  "name": "LifeMap - 年齢別人生目標・バケットリスト",
+  "description": "自分の年齢から逆算して、何歳で何を達成するか・どこへ行くかを可視化・管理できる人生のロードマップアプリ。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
