@@ -12,6 +12,7 @@ import { TimelineView } from './components/TimelineView';
 import { TravelView } from './components/TravelView';
 import { GoalModal } from './components/GoalModal';
 import { ProfileModal } from './components/ProfileModal';
+import { PWAInstallButton } from './components/PWAInstallButton';
 
 export default function App() {
   const [profile, setProfile] = useState<UserProfile>(loadProfile);
@@ -150,7 +151,11 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full px-4 py-4 sm:py-5">
+      <main className="flex-1 w-full px-4 py-3 sm:py-5">
+        <div className="max-w-xl mx-auto">
+          <PWAInstallButton />
+        </div>
+
         {activeTab === 'timeline' && (
           <TimelineView
             goals={goals}

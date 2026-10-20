@@ -108,6 +108,36 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </span>
           </div>
 
+          {/* PWA App Icon and Home Screen installation */}
+          <div className="pt-3 border-t border-slate-200 text-xs">
+            <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/80">
+              <div className="flex items-center gap-2">
+                <img
+                  src="/pwa-192x192.png"
+                  alt="App Icon"
+                  className="w-7 h-7 rounded-lg shrink-0 object-cover"
+                />
+                <div>
+                  <div className="font-semibold text-slate-800">スマホアプリ化 (PWA)</div>
+                  <div className="text-[10px] text-slate-500">ホーム画面からすぐ起動</div>
+                </div>
+              </div>
+              <a
+                href="#install"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onClose();
+                  // Trigger install if available
+                  const btn = document.querySelector('[data-pwa-install]') as HTMLButtonElement;
+                  if (btn) btn.click();
+                }}
+                className="text-xs font-semibold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+              >
+                追加手順
+              </a>
+            </div>
+          </div>
+
           {/* Data Backup & Reset Tools */}
           <div className="pt-3 border-t border-slate-200 space-y-2 text-xs">
             <div className="text-slate-500 font-medium">データ管理</div>
@@ -115,7 +145,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               <button
                 type="button"
                 onClick={() => exportDataAsJSON(profile, goals)}
-                className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition-colors"
+                className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition-colors cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>保存</span>
@@ -123,7 +153,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               <button
                 type="button"
                 onClick={onImportData}
-                className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition-colors"
+                className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition-colors cursor-pointer"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>復元</span>
@@ -136,7 +166,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     onClose();
                   }
                 }}
-                className="py-1.5 px-2 text-slate-400 hover:text-rose-600 rounded-lg"
+                className="py-1.5 px-2 text-slate-400 hover:text-rose-600 rounded-lg cursor-pointer"
                 title="初期化"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
